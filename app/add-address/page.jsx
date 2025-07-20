@@ -7,7 +7,7 @@ import { useState } from "react";
 import { useAppContext } from "@/context/AppContext";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 const AddAddress = () => {
   const [address, setAddress] = useState({
