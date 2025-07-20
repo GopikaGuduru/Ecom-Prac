@@ -9,10 +9,12 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@clerk/nextjs": "^6.24.0",
+    "@clerk/nextjs": "^6.25.4",
+    "axios": "^1.10.0",
+    "cloudinary": "^2.7.0",
     "inngest": "^3.40.1",
     "mongoose": "^8.16.3",
-    "next": "15.1.6",
+    "next": "^15.2.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-hot-toast": "^2.5.1"
