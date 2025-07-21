@@ -5,7 +5,14 @@ import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
 const OrderSummary = () => {
-  const { currency, router, getCartCount, getCartAmount } = useAppContext();
+  const {
+    currency,
+    router,
+    getCartCount,
+    getCartAmount,
+    setCartItems,
+    cartItems,
+  } = useAppContext();
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const { user, getToken } = useAppContext();
@@ -37,7 +44,51 @@ const OrderSummary = () => {
     setIsDropdownOpen(false);
   };
 
-  const createOrder = async () => {};
+  const createOrder = async () => {
+    try {
+      if (!selectedAddress) {
+        return toast.error("Please select an address");
+      }
+
+      let cartItemsArray = Object.keys(cartItems).map((key) => ({
+        product: key,
+        quantity: cartItems[key],
+      }));
+
+      cartItemsArray = cartItemsArray.filter((item) => item.quantity > 0);
+
+      if (cartItemsArray.length === 0) {
+        return toast.error("Cart is empty");
+      }
+
+      const token = await getToken();
+
+      // Example request to backend to create order
+      const { data } = await axios.post(
+        "/api/order/create",
+        {
+          address: selectedAddress._id,
+          items: cartItemsArray,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (data.success) {
+        toast.success(data.message);
+        setCartItems({});
+        router.push("/order-placed");
+      } else {
+        console.error(data.message);
+      }
+      // Optionally clear cart or navigate
+    } catch (error) {
+      console.error(error);
+      toast.error(error.message);
+    }
+  };
 
   useEffect(() => {
     fetchUserAddresses();

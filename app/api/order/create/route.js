@@ -12,10 +12,15 @@ export async function POST(request) {
     if (!address || items.length === 0) {
       return NextResponse.json({ success: false, message: "Invalid Data" });
     }
-    const amount = await items.reduce(async (acc, item) => {
+
+    // Calculate amount
+    let amount = 0;
+    for (const item of items) {
       const product = await Product.findById(item.product);
-      return acc + product.offerPrice * item.quantity;
-    });
+      if (!product) continue;
+      amount += product.offerPrice * item.quantity;
+    }
+
     await inngest.send({
       name: "order/created",
       data: {
@@ -26,9 +31,13 @@ export async function POST(request) {
         date: Date.now(),
       },
     });
-    const user = User.findById(userId);
-    user.cartItems = {};
-    await user.save();
+
+    const user = await User.findById(userId);
+    if (user) {
+      user.cartItems = {};
+      await user.save();
+    }
+
     return NextResponse.json({ success: true, message: "Order Placed" });
   } catch (error) {
     return NextResponse.json({ success: false, message: error.message });
